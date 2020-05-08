@@ -1,0 +1,35 @@
+a {
+    color: #b30059;
+}
+body {
+    background-image: url("back.png");
+    background-color: #ffcce6;
+
+}
+.column {
+    float: left;
+    width: 50%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.left {
+    background-color: #ff99cc;
+    width: 25%;
+}
+
+.right {
+    background-color: #ff99cc;
+    width: 50%;
+}
+
+@media screen and (max-width: 600px) {
+    .column {
+        width: 100%;
+    }
+}
