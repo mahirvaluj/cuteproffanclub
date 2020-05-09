@@ -8,10 +8,17 @@
 
 (setq *dispatch-table* nil)
 
-(defparameter *prof-table* nil)
+(eval-when (:compile-toplevel)
+  (defvar *prof-table* nil))
+(eval-when (:load-toplevel)
+  (defparameter *prof-table* nil))
 (defvar *server* nil)
 
+(hunchentoot:define-easy-handler (fuck :uri "/") ()
+  (hunchentoot:redirect "/home.html"))
+
 (defun run-server (port)
+  (push (hunchentoot:create-regex-dispatcher "/$" #'home) *dispatch-table*)
   (setf *server* (start (make-instance 'easy-acceptor :port port :document-root #p"./www/"))))
 
 (defmacro standard-page (title &body body)
