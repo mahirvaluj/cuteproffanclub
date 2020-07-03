@@ -130,4 +130,22 @@
   (:img :src "/gilles2.png" :alt "Professor Gilles Lamothe" :width "50%")
   (:br))
 
+(add-prof "Tanvir Quadir" tanvir
+  (:img :src "/tanvir.png" :alt "Professor Tanvir Quadir" :width "50%")
+  (:br)
+  (:h3 "Tanvir Quadir is by far the cuwutest prof at the University
+  of Ottawa. He is not only a fantastic lecturer, but he is
+  also really caring and willing to help students. Kawaii
+  desu!! His notes are written kamisama sent and extremely
+  easy to understand. He is truly amazing at his job. More
+  importantly, he is adowable :pleadingface:.")
+  (:br)
+  (:h3 "His cutest feature by far is his wittle smile which surfaces
+  when he gets excited about statistics. He will often start talking and
+  get really passionate and break his poker face. Tanvir is your typical
+  tsundere so seeing his smile is a rare but beautiful feat. ")
+  (:br)
+  (:h3 " His second cutest feature is his smol stature. He is
+  approximately 5’3. However, if he stands on his money, he is 6’5. Uwu
+  the man is indeed adorable. "))
 
