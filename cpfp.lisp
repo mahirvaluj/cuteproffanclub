@@ -3,29 +3,26 @@
   (:import-from :hunchentoot
                 :create-prefix-dispatcher :easy-acceptor :start :*dispatch-table*)
   (:import-from :cl-who :with-html-output)
-  (:export :run-server))
+  (:export :run-server
+           :*standard-outpu))
 (in-package :cute-prof-fanpage)
 
 (setq *dispatch-table* nil)
 
-(eval-when (:compile-toplevel)
-  (defvar *prof-table* nil))
-(eval-when (:load-toplevel)
-  (defparameter *prof-table* nil))
 (defvar *server* nil)
 
-(hunchentoot:define-easy-handler (fuck :uri "/") ()
-  (hunchentoot:redirect "/home.html"))
+(defvar *prof-table* nil)
 
 (defun run-server (port)
-  (push (hunchentoot:create-regex-dispatcher "/$" #'home) *dispatch-table*)
+  (push (hunchentoot:create-regex-dispatcher "/$" #'(lambda () (home))) *dispatch-table*)
   (setf *server* (start (make-instance 'easy-acceptor :port port :document-root #p"./www/"))))
 
-(defmacro standard-page (title &body body)
-  `(with-html-output (*standard-output* nil :indent t)
+(defun standard-page (title body)
+  (cl-who:with-html-output-to-string (s nil :indent t) ;(*standard-output* nil :prologue t :indent t)
      (:html
+      (write-string "<!-- Written by Sean uwu -->" s)
       (:head
-       (:title ,title)
+       (:title (write-string title s))
        (:meta :http-equiv "Content-Type" 
               :content    "text/html;charset=utf-8"))
       (:link :type "text/css" 
@@ -36,23 +33,20 @@
        (:div :class "row"
              (:div :class "column left"
                    (:ul
-                    ,@(let ((acc))
-                        (dolist (p *prof-table*)
-                          (push `(:li (:font :size 5 (:a :href ,(format nil "/~(~a~).html" (second p)) ,(first p)))) acc))
-                        acc)))
+                    (loop for p in (reverse *prof-table*)
+                       collect (cl-who:htm
+                                (:li (:font :size 5 (:a :href (format nil "/~(~a~).html" (second p)) (write-string (first p) s))))))))
              (:div :class "column right"
-                   ,@body))))))
+                   (write-string body s)))))))
 
 (defmacro add-url-fn (name title &body body)
-  `(progn
-     (defun ,name ()
-       (standard-page ,title ,@body))
-     (push (create-prefix-dispatcher ,(format nil "/~(~a~).html" name) #',name) *dispatch-table*)))
+  `(progn (defun ,name ()
+            (standard-page ,title (cl-who:with-html-output-to-string (*standard-output* nil :indent t) ,@body)))
+          (push (hunchentoot:create-regex-dispatcher ,(format nil "/~(~a~).html$" name) #',name) *dispatch-table*)))
 
 (defmacro add-prof (full-name name &body body)
-  `(progn 
-     (push ',`(,full-name ,name) *prof-table*)
-     (add-url-fn ,name ,full-name ,@body)))
+  `(progn (push ',`(,full-name ,name) *prof-table*)
+          (add-url-fn ,name ,full-name ,body)))
 
 (add-url-fn home "Homepage"
   (:h3 "Your one stop shop for your fix of cute profs")
@@ -148,4 +142,3 @@
   (:h3 " His second cutest feature is his smol stature. He is
   approximately 5’3. However, if he stands on his money, he is 6’5. Uwu
   the man is indeed adorable. "))
-
